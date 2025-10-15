@@ -1,19 +1,22 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import DriverLicenseUpdateForm, CarForm
-from .models import Driver, Car, Manufacturer
+from .forms import DriverLicenseUpdateForm, CarForm, DriverCreationForm
+from .models import Car, Manufacturer
+
+User = get_user_model()
 
 
 @login_required
 def index(request):
     """View function for the home page of the site."""
 
-    num_drivers = Driver.objects.count()
+    num_drivers = User.objects.count()
     num_cars = Car.objects.count()
     num_manufacturers = Manufacturer.objects.count()
 
@@ -114,30 +117,29 @@ class CarDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 
 class DriverListView(LoginRequiredMixin, generic.ListView):
-    model = Driver
+    model = User
     paginate_by = 5
 
 
 class DriverDetailView(LoginRequiredMixin, generic.DetailView):
-    model = Driver
-    queryset = Driver.objects.all().prefetch_related("cars__manufacturer")
+    model = User
+    queryset = User.objects.all().prefetch_related("cars__manufacturer")
 
 
 class DriverCreateView(LoginRequiredMixin, generic.CreateView):
-    model = Driver
-    fields = ("username", "license_number", "first_name", "last_name", "email",
-              "password")
+    model = User
+    form_class = DriverCreationForm
     success_url = reverse_lazy("taxi:driver-list")
 
 
 class DriverDeleteView(LoginRequiredMixin, generic.DeleteView):
-    model = Driver
+    model = User
     success_url = reverse_lazy("taxi:driver-list")
 
 
 @login_required
 def update_license_number(request, pk):
-    driver = get_object_or_404(Driver, pk=pk)
+    driver = get_object_or_404(User, pk=pk)
 
     if request.method == "POST":
         form = DriverLicenseUpdateForm(request.POST, instance=driver)
