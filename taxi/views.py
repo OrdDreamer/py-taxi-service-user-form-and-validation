@@ -123,6 +123,7 @@ class DriverListView(LoginRequiredMixin, generic.ListView):
 
 class DriverDetailView(LoginRequiredMixin, generic.DetailView):
     model = User
+    context_object_name = "driver"
     queryset = User.objects.all().prefetch_related("cars__manufacturer")
 
 

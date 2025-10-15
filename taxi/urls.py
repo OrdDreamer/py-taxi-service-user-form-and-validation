@@ -1,4 +1,3 @@
-from django.shortcuts import redirect
 from django.urls import path
 
 from .views import (
@@ -22,7 +21,7 @@ from .views import (
 )
 
 urlpatterns = [
-    path("/", index, name="index"),
+    path("", index, name="index"),
     path(
         "manufacturers/",
         ManufacturerListView.as_view(),
